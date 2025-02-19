@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""New view for Review objects that handles all default RestFul API actions
+"""The new view for Review API actions
 """
 
 from api.v1.views import app_views
@@ -13,11 +13,11 @@ from models.user import User
 @app_views.route('/places/<place_id>/reviews', methods=['GET', 'POST'],
                  strict_slashes=False)
 def review_methods(place_id):
-    """Calls method for Review object with place_id"""
+    """Using Calls method"""
     reviews = storage.all(Review)
     places = storage.all(Place)
 
-    # GET REQUESTS
+    # GETTING THE REQUESTS
     if request.method == "GET":
         place_key = "Place." + place_id
         try:
@@ -27,7 +27,7 @@ def review_methods(place_id):
         except KeyError:
             abort(404)
 
-    # POST REQUESTS
+    # POSTTING THE REQUESTS
     elif request.method == "POST":
         if request.is_json:
             body_request = request.get_json()
@@ -52,7 +52,7 @@ def review_methods(place_id):
             storage.save()
             return jsonify(new_review.to_dict()), 201
 
-    # UNSUPPORTED REQUESTS
+    # UNSUPPORT
     else:
         abort(501)
 
@@ -60,10 +60,10 @@ def review_methods(place_id):
 @app_views.route('/reviews/<review_id>', methods=['GET', 'DELETE', 'PUT'],
                  strict_slashes=False)
 def reviews_id_mothods(review_id):
-    """Review object methods"""
+    """Review methods"""
     reviews = storage.all(Review)
 
-    # GET REQUESTS
+    # GETTING THE REQUESTS
     if request.method == "GET":
         if not review_id:
             return jsonify([obj.to_dict() for obj in reviews.values()])
@@ -73,7 +73,7 @@ def reviews_id_mothods(review_id):
         except KeyError:
             abort(404)
 
-    # DELETE REQUESTS
+    # DELETING THE REQUESTS
     elif request.method == "DELETE":
         try:
             key = "Review." + review_id
@@ -83,7 +83,7 @@ def reviews_id_mothods(review_id):
         except:
             abort(404)
 
-    # PUT REQUESTS
+    # PUTTING THE REQUESTS
     elif request.method == "PUT":
         review_key = "Review." + review_id
         try:
@@ -101,6 +101,6 @@ def reviews_id_mothods(review_id):
             storage.save()
             return review.to_dict(), 200
 
-    # UNSUPPORTED REQUESTS
+    # UNSUPPORT
     else:
         abort(501)
