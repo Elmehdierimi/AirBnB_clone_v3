@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Define routes for blueprint
+"""App views for the clone AirBnB
 """
 
 from api.v1.views import app_views
@@ -9,14 +9,14 @@ from models import storage
 
 @app_views.route('/status', strict_slashes=False)
 def status():
-    """Return status of application
+    """status of the app
     """
     return jsonify({'status': 'OK'})
 
 
 @app_views.route('/stats', strict_slashes=False)
 def stats():
-    """Retrieve count of objects in storage
+    """count of objects in the storage
     """
     from models.amenity import Amenity
     from models.city import City
