@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Routings for amenity-related API requests
+"""views for amenities related API actions
 """
 
 from api.v1.views import app_views
@@ -11,23 +11,23 @@ from models import storage
 @app_views.route('/amenities/<amenity_id>', methods=['GET', 'DELETE', 'PUT'],
                  strict_slashes=False)
 def amenity_methods(amenity_id=None):
-    """Handle requests to API for amentities
+    """amentities requests for API
     """
     from models.amenity import Amenity
     amenities = storage.all(Amenity)
 
-    # GET REQUESTS
+    # REQUESTS
     if request.method == 'GET':
-        if not amenity_id:  # if no id specified, return all
+        if not amenity_id:
             return jsonify([obj.to_dict() for obj in amenities.values()])
 
         key = 'Amenity.' + amenity_id
-        try:  # if obj exists in dictionary, convert from obj -> dict -> json
+        try:
             return jsonify(amenities[key].to_dict())
         except KeyError:
-            abort(404)  # Amenity with amenity_id does not exist
+            abort(404)
 
-    # DELETE REQUESTS
+    # deleting those REQUESTS
     elif request.method == 'DELETE':
         try:
             key = 'Amenity.' + amenity_id
@@ -37,30 +37,25 @@ def amenity_methods(amenity_id=None):
         except:
             abort(404)
 
-    # POST REQUESTS
+    # posting REQUESTS
     elif request.method == 'POST':
-        # convert JSON request to dict
-        if request.is_json:
+	if request.is_json:
             body_request = request.get_json()
         else:
             abort(400, 'Not a JSON')
-
-        # instantiate, store, and return new Amenity object
         if 'name' in body_request:
             new_amenity = Amenity(**body_request)
             storage.new(new_amenity)
             storage.save()
             return jsonify(new_amenity.to_dict()), 201
-        else:  # if request does not contain required attribute
+        else:
             abort(400, 'Missing name')
 
-    # PUT REQUESTS
+    # putting REQUESTS
     elif request.method == 'PUT':
         key = 'Amenity.' + amenity_id
         try:
             amenity = amenities[key]
-
-            # convert JSON request to dict
             if request.is_json:
                 body_request = request.get_json()
             else:
@@ -75,6 +70,6 @@ def amenity_methods(amenity_id=None):
         except KeyError:
             abort(404)
 
-    # UNSUPPORTED REQUESTS
+    # this one is for the unsupported requests
     else:
         abort(501)
