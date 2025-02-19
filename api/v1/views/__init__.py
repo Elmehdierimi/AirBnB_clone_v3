@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Initialize module
+"""the view of the AirBnB
 """
 
 from flask import Blueprint
