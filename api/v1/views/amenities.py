@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Routings for amenity-related API requests
+"""views of amanitites related to API
 """
 
 from api.v1.views import app_views
@@ -11,23 +11,23 @@ from models import storage
 @app_views.route('/amenities/<amenity_id>', methods=['GET', 'DELETE', 'PUT'],
                  strict_slashes=False)
 def amenity_methods(amenity_id=None):
-    """Handle requests to API for amentities
+    """handling requests to API
     """
     from models.amenity import Amenity
     amenities = storage.all(Amenity)
 
-    # GET REQUESTS
+    # GETTING REQUESTS
     if request.method == 'GET':
-        if not amenity_id:  # if no id specified, return all
+        if not amenity_id:  # if no return all
             return jsonify([obj.to_dict() for obj in amenities.values()])
 
         key = 'Amenity.' + amenity_id
-        try:  # if obj exists in dictionary, convert from obj -> dict -> json
+        try:  # if yes convert from obj to dict to json
             return jsonify(amenities[key].to_dict())
         except KeyError:
-            abort(404)  # Amenity with amenity_id does not exist
+            abort(404)  # amenity_id doesnt exist
 
-    # DELETE REQUESTS
+    # DELETING THE REQUESTS
     elif request.method == 'DELETE':
         try:
             key = 'Amenity.' + amenity_id
@@ -37,30 +37,30 @@ def amenity_methods(amenity_id=None):
         except:
             abort(404)
 
-    # POST REQUESTS
+    # POSTING THE REQUESTS
     elif request.method == 'POST':
-        # convert JSON request to dict
+        # jSON to dict
         if request.is_json:
             body_request = request.get_json()
         else:
             abort(400, 'Not a JSON')
 
-        # instantiate, store, and return new Amenity object
+        # instantiating store return new Amenity
         if 'name' in body_request:
             new_amenity = Amenity(**body_request)
             storage.new(new_amenity)
             storage.save()
             return jsonify(new_amenity.to_dict()), 201
-        else:  # if request does not contain required attribute
+        else:  # request doesnt contain attribute
             abort(400, 'Missing name')
 
-    # PUT REQUESTS
+    # PUTTING THE REQUESTS
     elif request.method == 'PUT':
         key = 'Amenity.' + amenity_id
         try:
             amenity = amenities[key]
 
-            # convert JSON request to dict
+            # JSON to dict
             if request.is_json:
                 body_request = request.get_json()
             else:
@@ -75,6 +75,6 @@ def amenity_methods(amenity_id=None):
         except KeyError:
             abort(404)
 
-    # UNSUPPORTED REQUESTS
+    # UNSUPPORTED
     else:
         abort(501)
