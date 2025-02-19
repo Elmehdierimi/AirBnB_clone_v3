@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Places view API request handlers
+"""views for places API
 """
 
 from api.v1.views import app_views
@@ -16,18 +16,18 @@ from models.amenity import Amenity
                  methods=['POST'],
                  strict_slashes=False)
 def places_search():
-    """Search for place according to parameters
-    in body request
+    """Searching 4 place related to para
+    in the body of the request
     """
-    # POST REQUEST
-    if request.is_json:  # check is request is valid json
+    # POSTTING THE REQUEST
+    if request.is_json:  # if request is valid json
         body = request.get_json()
     else:
         abort(400, 'Not a JSON')
 
     place_list = []
 
-    # if states searched
+    # states searching
     if 'states' in body:
         for state_id in body['states']:
             state = storage.get(State, state_id)
@@ -36,7 +36,7 @@ def places_search():
                     for place in city.places:
                         place_list.append(place)
 
-    # if cities searched
+    # cities searching
     if 'cities' in body:
         for city_id in body['cities']:
             city = storage.get(City, city_id)
@@ -44,7 +44,7 @@ def places_search():
                 for place in city.places:
                     place_list.append(place)
 
-    # if 'amenities' present
+    # presence of amenities
     if 'amenities' in body and len(body['amenities']) > 0:
         if len(place_list) == 0:
             place_list = [place for place in storage.all(Place).values()]
@@ -61,7 +61,7 @@ def places_search():
     if len(place_list) == 0:
         place_list = [place for place in storage.all(Place).values()]
 
-    # convert objs to dict and remove 'amenities' key
+    # objs to dict/ delete amaneties key
     place_list = [place.to_dict() for place in place_list]
     for place in place_list:
         try:
@@ -78,9 +78,9 @@ def places_search():
 def places_by_city_requests(city_id):
     """Perform API requests of places by city
     """
-    # GET REQUESTS
+    # GETTING REQUESTS
     if request.method == 'GET':
-        # retrieve all places related to specific city, if exists
+        # retrieving all places related to specific city
         cities = storage.all(City)
         try:
             key = 'City.' + city_id
@@ -90,38 +90,38 @@ def places_by_city_requests(city_id):
         except KeyError:
             abort(404)
 
-    # POST REQUESTS
+    # POSTTING THE REQUESTS
     elif request.method == 'POST':
-        # create a new place
+        # new place
         cities = storage.all(City)
 
         if ('City.' + city_id) not in cities.keys():
             abort(404)
 
-        if request.is_json:  # check is request is valid json
+        if request.is_json:  # validing json
             body_request = request.get_json()
         else:
             abort(400, 'Not a JSON')
 
-        # check for required attributes
+        # required attributes
         if 'name' not in body_request:
             abort(400, 'Missing name')
         if 'user_id' not in body_request:
             abort(400, 'Missing user_id')
 
-        # verify user_id is valid
+        # verifying the user_id
         users = storage.all(User)
         if ('User.' + body_request['user_id']) not in users.keys():
             abort(404)
 
-        # instantiate, store, and return new State object
+        # instantiating store return new State
         body_request.update({'city_id': city_id})
         new_place = Place(**body_request)
         storage.new(new_place)
         storage.save()
         return jsonify(new_place.to_dict()), 201
 
-    # UNSUPPORTED REQUESTS
+    # UNSUPPORTTING
     else:
         abort(501)
 
@@ -130,12 +130,12 @@ def places_by_city_requests(city_id):
                  methods=['GET', 'DELETE', 'PUT'],
                  strict_slashes=False)
 def place_methods(place_id=None):
-    """Perform API requests of on place objects
+    """API requests on place objects
     """
-    # GET REQUESTS
+    # GETTING REQUESTS
     if request.method == 'GET':
 
-        # retrieve specific place object, if exists
+        # specific place object
         places = storage.all(Place)
         try:
             key = 'Place.' + place_id
@@ -144,10 +144,10 @@ def place_methods(place_id=None):
         except KeyError:
             abort(404)
 
-    # DELETE REQUESTS
+    # REMOVING REQUESTS
     elif request.method == 'DELETE':
 
-        # delete specific place, if exists
+        # delete of specific place
         places = storage.all(Place)
         try:
             key = 'Place.' + place_id
@@ -157,20 +157,20 @@ def place_methods(place_id=None):
         except KeyError:
             abort(404)
 
-    # PUT REQUESTS
+    # PUTTING REQUESTS
     elif request.method == 'PUT':
         places = storage.all(Place)
         key = 'Place.' + place_id
         try:
             place = places[key]
 
-            # convert JSON request to dict
+            # JSON to dict
             if request.is_json:
                 body_request = request.get_json()
             else:
                 abort(400, 'Not a JSON')
 
-            # update Place object
+            # updating Place object
             ignore = ['id', 'user_id', 'city_id', 'created_at', 'updated_at']
             for key, val in body_request.items():
                 if key not in ignore:
@@ -182,6 +182,6 @@ def place_methods(place_id=None):
         except KeyError:
             abort(404)
 
-    # UNSUPPORTED REQUESTS
+    # UNSUPPORTING
     else:
         abort(501)
