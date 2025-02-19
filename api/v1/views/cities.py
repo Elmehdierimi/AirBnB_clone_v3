@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""New view for City objects that handles all default RestFul API actions
+"""views for Cities that handles RestFul API actions
 """
 
 from api.v1.views import app_views
@@ -12,11 +12,11 @@ from models.city import City
 @app_views.route('/states/<state_id>/cities', methods=['GET', 'POST'],
                  strict_slashes=False)
 def city_methods(state_id):
-    """Calls method for City object with state_id"""
+    """Calls method"""
     cities = storage.all(City)
     states = storage.all(State)
 
-    # GET REQUESTS
+    # GETTING THE REQUESTS
     if request.method == "GET":
         state_key = "State." + state_id
         try:
@@ -26,7 +26,7 @@ def city_methods(state_id):
         except KeyError:
             abort(404)
 
-    # POST REQUESTS
+    # POSTING THE REQUESTS
     elif request.method == "POST":
         if request.is_json:
             body_request = request.get_json()
@@ -48,10 +48,10 @@ def city_methods(state_id):
 @app_views.route('/cities/<city_id>', methods=['GET', 'DELETE', 'PUT'],
                  strict_slashes=False)
 def cities_id_mothods(city_id):
-    """Retrieves a City object with GET"""
+    """City object and GET retrieve"""
     cities = storage.all(City)
 
-    # GET REQUESTS
+    # GETTING THE REQUESTS
     if request.method == "GET":
         if not city_id:
             return jsonify([obj.to_dict() for obj in cities.values()])
@@ -60,7 +60,7 @@ def cities_id_mothods(city_id):
             return jsonify(cities[key].to_dict())
         except KeyError:
             abort(404)
-    # DELETE REQUESTS
+    # DELETING THE REQUESTS
     elif request.method == "DELETE":
         try:
             key = "City." + city_id
@@ -69,7 +69,7 @@ def cities_id_mothods(city_id):
             return jsonify({}), 200
         except:
             abort(404)
-    # PUT REQUESTS
+    # PUTTING REQUESTS
     elif request.method == "PUT":
         city_key = "City." + city_id
         try:
