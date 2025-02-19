@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""View to handle API actions related to User objects
+"""View for users to handle API
 """
 
 from api.v1.views import app_views
@@ -11,24 +11,24 @@ from models import storage
 @app_views.route('/users/<user_id>', methods=['GET', 'DELETE', 'PUT'],
                  strict_slashes=False)
 def users_method(user_id=None):
-    """Manipulate User object by user_id, or all objects if
-    user_id is None
+    """if id is none manipulate the
+    user object
     """
     from models.user import User
     users = storage.all(User)
 
-    # GET REQUESTS
+    # GETTING THE REQUESTS
     if request.method == 'GET':
-        if not user_id:  # if no, user id specified, return all
+        if not user_id:  # return all if theres no user
             return jsonify([obj.to_dict() for obj in users.values()])
 
         key = 'User.' + user_id
-        try:  # if obj exists in dictionary, convert from obj -> dict -> json
+        try:  # from obj to dict to json if user exist in the dic
             return jsonify(users[key].to_dict())
         except KeyError:
-            abort(404)  # if User of user_id does not exist
+            abort(404)  # if the User doesnt exist
 
-    # DELETE REQUESTS
+    # DELETTING THE REQUESTS
     elif request.method == 'DELETE':
         try:
             key = 'User.' + user_id
@@ -38,33 +38,33 @@ def users_method(user_id=None):
         except:
             abort(404)
 
-    # POST REQUESTS
+    # POSTTING THE REQUESTS
     elif request.method == 'POST':
-        # convert JSON request to dict
+        # JSON to dict
         if request.is_json:
             body_request = request.get_json()
         else:
             abort(400, 'Not a JSON')
 
-        # check for missing attributes
+        # missing attributes
         if 'email' not in body_request:
             abort(400, 'Missing email')
         elif 'password' not in body_request:
             abort(400, 'Missing password')
-        # instantiate, store, and return new User object
+        # STORE OR RETURN new User object
         else:
             new_user = User(**body_request)
             storage.new(new_user)
             storage.save()
             return jsonify(new_user.to_dict()), 201
 
-    # PUT REQUESTS
+    # PUTting the REQUESTS
     elif request.method == 'PUT':
         key = 'User.' + user_id
         try:
             user = users[key]
 
-            # convert JSON request to dict
+            # JSON to dict
             if request.is_json:
                 body_request = request.get_json()
             else:
@@ -81,6 +81,6 @@ def users_method(user_id=None):
         except KeyError:
             abort(404)
 
-    # UNSUPPORTED REQUESTS
+    # UNSUPPORTing
     else:
         abort(501)
